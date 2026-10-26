@@ -7,3 +7,4 @@
 2026-10-26 | M6 | scaffolding DONE (all files in report table exist); figures from benchmark pending M4; references 2 and 3 only partly verified, see references.md | student to review
 2026-10-26 | M4 (A-local) | 9 rows imported (laptop-a, hardware Iris Xe, Chrome 151); 3 stale rows from an earlier test (machine_id=laptop) excluded | B-local and B-remote runs still to do
 2026-10-26 | M4 tools | added bench/run_all_b.sh (automates all 18 B runs), ws_bytes_setup recorded in notes
+- M4: Showcase B benchmark on laptop-a (Iris Xe, 18 rows: B-local/B-remote x 64/128/256 x 3 reps) recorded; remote FPS flat ~20 across sizes (likely trame update throttle, not render cost) - see install_log.

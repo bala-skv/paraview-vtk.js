@@ -28,3 +28,11 @@ Evidence for the report. Failures are recorded as they happened.
 | 2026-10-26 | Showcase A benchmark mode, 3 reps foot_128 (8 frames) in headless Chrome + SwiftShader | ~1.5 min | 40 frames x 3 reps exceeded a 4-min wait under software GL | Logic verified (3 CSV rows, correct schema). Real FPS numbers need a GPU browser (student run) | Linux |
 | 2026-10-26 | `pkill -f` used while shell command line contained the pattern | - | killed my own shell twice | use `fuser -k PORT/tcp` | Linux |
 | 2026-10-26 | **Clean-room test**: `git clone` into a new folder, no venvs or node_modules, `scripts/setup.sh` with `PVPYTHON` set | 2 min 10 s | none | all 9 steps passed (venvs, `npm ci`, 4 downloads + conversion, `check_env` OK in both). Then started `run_a`, `run_b`, `run_b_fallback` (HTTP 200/302/302) and ran Showcase A bench mode with 1 rep (1 CSV row, imported by `add_row.py`, plotted by `plot_results.py`). Done on this Linux laptop with headless Chrome + software GL; Windows scripts untested | Linux |
+
+## 2026-10-26 Showcase B benchmark (laptop-a, scripted puppeteer orbit, 10 s)
+- 18 rows appended via bench/run_all_b.sh (~25 min wall clock incl. server restarts).
+- B-local: 60 fps (display cap) at all sizes, ws_bytes 0 during orbit; geometry 3.0/12.3/49.6 MB (64/128/256).
+- B-remote: ~20 fps at all sizes, ~4 MB ws traffic per 10 s. Flat across sizes => probably limited by trame's update/throttle path or the scripted mouse rate, NOT by render cost. Do not claim a size trend; investigate before reporting.
+- B-remote rep 3 TTFR outliers (2.7-2.9 s) at all three sizes vs ~0.37 s for reps 1-2; cause unknown (server-side warm-up/GC?). Median hides it; mention in report.
+- Server RSS grows with size (709 -> 958 MB local; 732 -> 980 MB remote).
+- auto_b.mjs launches Chrome without the user's Wayland flags; renderer string in CSV is as passed via GPU= env, not verified from the launched browser.

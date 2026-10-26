@@ -13,6 +13,12 @@ if [ -z "$PV" ] || [ ! -x "$PV" ]; then
   exit 1
 fi
 [ -d .pvenv ] || { echo ".pvenv missing: run scripts/setup.sh"; exit 1; }
-echo "Showcase B: http://localhost:8080"
+PORT="${PORT:-8080}"
+if (exec 3<>"/dev/tcp/127.0.0.1/$PORT") 2>/dev/null; then
+  echo "Port $PORT is already in use (an earlier Showcase B still running?)."
+  echo "Stop it (Ctrl+C in its terminal, or: fuser -k $PORT/tcp) or use another port: PORT=8081 scripts/run_b.sh"
+  exit 1
+fi
+echo "Showcase B: http://localhost:$PORT"
 # --venv must come BEFORE the script path
-exec "$PV" --venv .pvenv showcase-b/app.py --port 8080 --server "$@"
+exec "$PV" --venv .pvenv showcase-b/app.py --port "$PORT" --server "$@"

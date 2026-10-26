@@ -1,0 +1,24 @@
+{
+  "os": "Linux-7.0.11-76070011-generic-x86_64-with-glibc2.39",
+  "wsl": false,
+  "cpu": "11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+  "cores_logical": 8,
+  "ram_gb": 31.1,
+  "gpu": [
+    "00:02.0 VGA compatible controller: Intel Corporation TigerLake-LP GT2 [Iris Xe Graphics] (rev 01)"
+  ],
+  "python": "3.12.3",
+  "node": "v24.13.0",
+  "npm": "11.6.2",
+  "paraview": null,
+  "packages": {
+    "vtk": "9.7.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "matplotlib": "3.11.2",
+    "trame": "4.0.0",
+    "trame-vtk": "2.11.17",
+    "trame-vuetify": "3.3.0",
+    "psutil": "7.2.2"
+  }
+}

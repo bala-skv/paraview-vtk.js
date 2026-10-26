@@ -1,0 +1,4 @@
+trame==4.0.0
+trame-vtk==2.11.17
+trame-vuetify==3.3.0
+psutil

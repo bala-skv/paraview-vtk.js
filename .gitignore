@@ -1,0 +1,12 @@
+data/raw/*
+data/vti/*
+!data/raw/.gitkeep
+!data/vti/.gitkeep
+showcase-a/public/data/*
+!showcase-a/public/data/.gitkeep
+.venv/
+.pvenv/
+node_modules/
+dist/
+__pycache__/
+*.pyc

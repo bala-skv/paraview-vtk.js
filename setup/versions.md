@@ -15,5 +15,5 @@
 | psutil | 7.2.2 | |
 | vtk (pip, .venv only) | 9.7.1 | |
 | numpy / pandas / matplotlib (.venv only) | 2.5.4 / 3.1.0 / 3.11.2 | |
-| ParaView | **not installed yet** | blocked, see report/install_log.md |
+| ParaView | downloading 6.2.0 (see install_log) | |
 | Browser | Google Chrome (headless used for M0 check), Firefox present | |

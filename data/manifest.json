@@ -1,0 +1,74 @@
+{
+  "base_url": "http://klacansky.com/open-scivis-datasets",
+  "note": "HTTPS to klacansky.com was refused from the dev machine on 2026-10-26; plain HTTP works. sha256 is filled by fetch_data.py on first download.",
+  "datasets": [
+    {
+      "name": "foot",
+      "url": "http://klacansky.com/open-scivis-datasets/foot/foot_256x256x256_uint8.raw",
+      "dims": [
+        256,
+        256,
+        256
+      ],
+      "dtype": "uint8",
+      "spacing": [
+        1,
+        1,
+        1
+      ],
+      "sha256": "e5b296aa009eb1e84316bc8694dd4ec196f0ad9e1442fb4f08cf44c70e3b7dc4",
+      "role": "Main demo; resized copies foot_64/foot_128 for the benchmark"
+    },
+    {
+      "name": "aneurism",
+      "url": "http://klacansky.com/open-scivis-datasets/aneurism/aneurism_256x256x256_uint8.raw",
+      "dims": [
+        256,
+        256,
+        256
+      ],
+      "dtype": "uint8",
+      "spacing": [
+        1,
+        1,
+        1
+      ],
+      "sha256": "2826a66db406f19bdd9e38cfe42a80b861fbce34a947c24ce511f07f1c160b83",
+      "role": "Vessel preset demo"
+    },
+    {
+      "name": "bonsai",
+      "url": "http://klacansky.com/open-scivis-datasets/bonsai/bonsai_256x256x256_uint8.raw",
+      "dims": [
+        256,
+        256,
+        256
+      ],
+      "dtype": "uint8",
+      "spacing": [
+        1,
+        1,
+        1
+      ],
+      "sha256": "288d2818cffb50d2e2c9e3b5b0a2520d09b0f5051bb63cca315f3fc7a894af80",
+      "role": "Opacity preset demo"
+    },
+    {
+      "name": "tooth",
+      "url": "http://klacansky.com/open-scivis-datasets/tooth/tooth_103x94x161_uint8.raw",
+      "dims": [
+        103,
+        94,
+        161
+      ],
+      "dtype": "uint8",
+      "spacing": [
+        1,
+        1,
+        1
+      ],
+      "sha256": "1ae7d4681ad9b58c3778af0742f3c585354625a6aed232a181c93c669522172e",
+      "role": "Fast-loading demo"
+    }
+  ]
+}

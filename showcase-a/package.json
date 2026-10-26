@@ -10,7 +10,8 @@
     "verify-data": "node verify_vti.mjs"
   },
   "dependencies": {
-    "@kitware/vtk.js": "37.4.6"
+    "@kitware/vtk.js": "37.4.6",
+    "events": "3.3.0"
   },
   "devDependencies": {
     "vite": "8.3.5"

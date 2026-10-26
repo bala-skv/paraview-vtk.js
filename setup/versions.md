@@ -15,5 +15,6 @@
 | psutil | 7.2.2 | |
 | vtk (pip, .venv only) | 9.7.1 | |
 | numpy / pandas / matplotlib (.venv only) | 2.5.4 / 3.1.0 / 3.11.2 | |
-| ParaView | downloading 6.2.0 (see install_log) | |
+| ParaView | 6.2.0 (MPI Linux tarball) | bundled Python 3.12.14, numpy 2.4.3; at `~/opt/ParaView-6.2.0-MPI-Linux-Python3.12-x86_64` |
+| events (npm polyfill) | 3.3.0 | needed by vtk.js -> xmlbuilder2 in Vite |
 | Browser | Google Chrome (headless used for M0 check), Firefox present | |

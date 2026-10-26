@@ -41,3 +41,9 @@ Evidence for the report. Failures are recorded as they happened.
 - Client side: trame-vtk.js mouse handler has `throttleDelay: 33.3` ms (max ~30 mouse events/s sent to the server). With puppeteer CDP overhead per move, ~20 events/s arrive => the scripted-drag FPS is capped by the client input throttle, not by rendering.
 - Server side: the built-in "Benchmark orbit" (180 steps) in server_events.csv took 2.90-2.93 s at all sizes (64: 2.90-2.91, 128: 2.92-2.93, 256: 2.91-2.93) = ~62 renders/s for 66k to 1.1M triangles. Also flat => this hardware/scene does not discriminate sizes for remote rendering either.
 - Conclusion: report remote FPS as "input-throttle limited (~20-30 fps for drag)" and use the server orbit (~62 steps/s) as the render-capacity figure. No size trend claimed. Rep-3 TTFR outliers still unexplained.
+
+## 2026-10-26 Clean-room on student machine: dataset download stalls (klacansky.com)
+- Symptom: `setup.sh` stuck at step 8/9; `data/raw/foot_...raw.part` was 3 MB after ~11 min (~5 kB/s). Old `fetch_data.py` used a per-read 60 s timeout, so a trickling connection never timed out, and every retry restarted from byte 0.
+- Server speed varies a lot (same host measured ~31 kB/s later from the dev laptop, though it was fast earlier). Evaluation note: the datasets have a single, slow, http-only host.
+- Fix: `data/fetch_data.py` now resumes via HTTP Range, aborts an attempt averaging < 50 kB/s over 20 s, retries 6 times with resume, and prints a manual-copy fallback. Resume verified on tooth (byte-identical).
+- Fallback for a stuck machine: copy `data/raw/*.raw` from another machine/USB; sha256 is verified on the next run.

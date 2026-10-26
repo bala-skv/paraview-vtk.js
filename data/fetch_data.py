@@ -27,22 +27,39 @@ def raw_path(ds):
     return RAW / ds["url"].rsplit("/", 1)[1]
 
 
-def download(url, dest):
+MIN_BPS = 50_000  # abort an attempt that averages less than this over STALL_WINDOW seconds
+STALL_WINDOW = 20
+
+
+def download(url, dest, attempts=6):
+    """Resumable (HTTP Range) download that gives up on a trickling connection instead of hanging."""
+    tmp = dest.with_suffix(dest.suffix + ".part")
     last = None
-    for attempt in range(3):
+    for attempt in range(attempts):
         try:
-            tmp = dest.with_suffix(dest.suffix + ".part")
-            with urllib.request.urlopen(url, timeout=60) as r, open(tmp, "wb") as f:
-                while chunk := r.read(1 << 20):
-                    f.write(chunk)
+            have = tmp.stat().st_size if tmp.exists() else 0
+            req = urllib.request.Request(url, headers={"Range": f"bytes={have}-"} if have else {})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                if have and r.status != 206:  # server ignored Range: start over
+                    have = 0
+                t0, b0 = time.monotonic(), have
+                with open(tmp, "ab" if have else "wb") as f:
+                    while chunk := r.read(1 << 16):
+                        f.write(chunk)
+                        have += len(chunk)
+                        dt = time.monotonic() - t0
+                        if dt > STALL_WINDOW and (have - b0) / dt < MIN_BPS:
+                            raise TimeoutError(f"too slow ({(have - b0) / dt / 1000:.0f} kB/s)")
             tmp.replace(dest)
             return
         except Exception as e:  # noqa: BLE001
             last = e
-            wait = 2 ** (attempt + 1)
-            print(f"  attempt {attempt + 1}/3 failed: {e}; retrying in {wait}s", file=sys.stderr)
+            wait = min(2 ** (attempt + 1), 15)
+            print(f"  attempt {attempt + 1}/{attempts} failed at {tmp.stat().st_size if tmp.exists() else 0} bytes: "
+                  f"{e}; retrying (resume) in {wait}s", file=sys.stderr)
             time.sleep(wait)
-    raise SystemExit(f"FAIL: could not download {url}: {last}")
+    raise SystemExit(f"FAIL: could not download {url}: {last}\n"
+                     f"Fallback: copy the file into data/raw/ by hand (checksum is verified on the next run).")
 
 
 def main():

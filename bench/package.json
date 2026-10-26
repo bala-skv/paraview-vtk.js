@@ -1,0 +1,7 @@
+{
+  "name": "bench-helpers",
+  "private": true,
+  "type": "module",
+  "description": "Optional puppeteer helper for the Showcase B benchmark (see protocol.md)",
+  "dependencies": { "puppeteer-core": "25.16.0" }
+}

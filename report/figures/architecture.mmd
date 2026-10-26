@@ -1,0 +1,11 @@
+flowchart LR
+  subgraph A["Showcase A: static web app"]
+    VITE["Vite dev server<br/>serves files only"] -->|".vti + JS"| BA["Browser<br/>vtk.js + WebGL2<br/>volume rendering"]
+  end
+  subgraph B["Showcase B: trame app under pvpython"]
+    PV["ParaView pipeline<br/>Wavelet - Contour - Show"] --> TR["trame server<br/>wslink WebSocket"]
+    TR -->|"remote: compressed images"| BR["Browser<br/>shows images"]
+    TR -->|"local: geometry, sent per change"| BL["Browser<br/>vtk.js renders every frame"]
+  end
+  DATA["Datasets and benchmark harness"] -.-> A
+  DATA -.-> B

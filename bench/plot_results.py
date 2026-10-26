@@ -78,7 +78,8 @@ def fig_ttfr_bytes(df, out):
             ax.set_yscale("log")
         ax.spines[["top", "right"]].set_visible(False)
         ax.grid(alpha=.3)
-    axes[0].legend(frameon=False)
+    if axes[0].get_legend_handles_labels()[0]:
+        axes[0].legend(frameon=False)
     fig.suptitle("Showcase B: local vs remote rendering (localhost, no network latency)")
     fig.tight_layout()
     fig.savefig(out, dpi=150)

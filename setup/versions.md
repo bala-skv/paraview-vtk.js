@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | OS | Pop!_OS (Linux 7.0.11, x86_64), native, not WSL | |
 | CPU / RAM | i7-1185G7, 8 logical cores, 31 GB | |
-| GPU | Intel Iris Xe (integrated), no discrete GPU | |
+| GPU | Intel Iris Xe (TGL GT2, integrated), no discrete GPU | Chrome 151 via ANGLE/OpenGL on Mesa 25.2.8; WebGL and WebGPU hardware accelerated (from chromeGpuInfo.txt, 2026-10-26) |
 | Node.js / npm | 24.13.0 / 11.6.2 | design target was 22 LTS; 24 works |
 | Vite | 8.3.5 | pinned exact |
 | @kitware/vtk.js | 37.4.6 | pinned exact (latest 37.x on 2026-10-26) |

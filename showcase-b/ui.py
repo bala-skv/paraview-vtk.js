@@ -80,7 +80,8 @@ class ShowcaseApp:
                 "data_range": "", "feature_msg": "", "shot_url": "", "shot_dialog": False,
                 "state_files": [],
             })
-            self.state.vti = self.state.vti_files[0] if self.state.vti_files else ""
+            files = self.state.vti_files  # default to a small file: the 256^3 ones are slow under software GL
+            self.state.vti = "foot_64.vti" if "foot_64.vti" in files else (files[0] if files else "")
         self._initial_mode = initial_mode
         self._build_ui()
         self.state.change("iso")(self.on_iso)
@@ -251,7 +252,7 @@ class ShowcaseApp:
     def on_size(self, size, **_):
         if self.ready and int(size) != self.pipeline.size:
             self.timed("size_change", lambda: self.pipeline.set_size(int(size)), reset_camera=True)
-            if self.features:
+            if self.features and self._last_key is not None:  # only once the drawer has been used
                 self._last_key = None
                 self.on_feature()
 

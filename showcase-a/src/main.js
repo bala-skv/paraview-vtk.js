@@ -4,6 +4,7 @@ import { createViewer, parseVti } from './viewer';
 import { buildPanel, showInfo } from './ui';
 import { runBench } from './bench';
 import { initTools } from './tools';
+import { probeWebGPU } from './tools/webgpu';
 import { MESH_EXT, extOf } from './tools/mesh';
 
 const root = document.getElementById('app');
@@ -22,7 +23,9 @@ async function main() {
   const view = document.createElement('div');
   view.id = 'view';
   root.appendChild(view);
-  const viewer = createViewer(view, { fps: true });
+  const webgpu = params.get('api') === 'webgpu';
+  const gpuInfo = webgpu ? await probeWebGPU() : null;
+  const viewer = createViewer(view, { fps: true, api: webgpu ? 'WebGPU' : undefined });
   ui.preset.value = viewer.getState().preset;
   const glr = viewer.glRenderer();
   const tools = initTools(viewer, ui.tools, ui);
@@ -45,6 +48,7 @@ async function main() {
       ['Voxels', (d[0] * d[1] * d[2]).toLocaleString()],
       ['Load time', `${loadMs.toFixed(0)} ms`],
       ['WebGL renderer', glr],
+      ...(gpuInfo ? [['WebGPU', gpuInfo.available ? gpuInfo.adapter : gpuInfo.note || 'unavailable']] : []),
     ]);
   }
 

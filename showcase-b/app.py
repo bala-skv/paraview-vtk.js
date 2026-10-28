@@ -83,9 +83,10 @@ class ParaViewPipeline:
         if want is self.source:
             return False
         self.source = want
-        for f in list(self.filters.values()) + [self.grad]:
-            if f is not None:
-                simple.Delete(f)
+        for f in reversed(list(self.filters.values())):
+            simple.Delete(f)
+        if self.grad is not None:
+            simple.Delete(self.grad)
         self.filters, self.displays, self.grad = {}, {}, None
         if self.vol_display is not None:
             self.vol_display.Visibility = 0
@@ -161,15 +162,26 @@ class ParaViewPipeline:
         """Idempotent: make the scene match dict p. Returns {arrays, range, source_array, iso_range}."""
         changed_src = self._use_source(p["source"], p["vti"])
         kind = p["kind"]
-        for k, d in list(self.displays.items()):
-            if k != kind:
-                d.Visibility = 0
         f = self._configure(kind, p)
+        key = kind
+        if kind == "Contour":
+            # the isosurface only carries the contoured array (constant on the surface), so add an
+            # Elevation array to give colour-by something to show; the bench path never gets here
+            if "Elevation" not in self.filters:
+                self.filters["Elevation"] = simple.Elevation(Input=f)
+            b = self.source.GetDataInformation().GetBounds()
+            self.filters["Elevation"].LowPoint = [0, 0, b[4]]
+            self.filters["Elevation"].HighPoint = [0, 0, b[5]]
+            f, key = self.filters["Elevation"], "ContourE"
+        for k, d in list(self.displays.items()):
+            if k != key:
+                d.Visibility = 0
+                d.SetScalarBarVisibility(self.view, False)
         self.contour = f
         self.active = kind
-        disp = self.displays.get(kind)
+        disp = self.displays.get(key)
         if disp is None:
-            disp = self.displays[kind] = simple.Show(f, self.view)
+            disp = self.displays[key] = simple.Show(f, self.view)
         disp.Visibility = 1
         self.display = disp
         disp.Representation = self.representation

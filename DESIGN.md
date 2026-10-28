@@ -446,7 +446,7 @@ Extras are ranked by impact per hour. Take them strictly in rank order after the
 | E6 | Legacy Visualizer hands-on | 2 to 3 | Install the separately distributed Visualizer into its own venv and try it with ParaView 6.2. Log what works and what breaks | 3 h |
 | E7 | WebGPU probe | 2 | `?api=webgpu` in Showcase A. Side-by-side screenshots against WebGL2, and a list of missing features | 3 h |
 | E8 | Jupyter integration | 1 to 2 | `notebooks/trame_in_jupyter.ipynb` showing the Showcase B app inside a notebook | 3 h |
-| E9 | TTK topology on the server | 5+ | Persistence diagram and critical points streamed to the browser. Attempt only if a TTK build for ParaView 6.2 exists | 7 h |
+| E9 | TTK topology on the server | 5+ | Persistence diagram and critical points streamed to the browser. Attempt only if a TTK build for ParaView 6.2 exists. DONE 2026-10-28 in Phase 3 (Stream D): ParaView 6.2.0 ships TTK 1.3.0 as a plugin; see `report/features_d_log.md` | 7 h |
 | E10 | WebXR volume | 3+ | Adapt the vtk.js WebXR volume example, tested with a browser XR emulator | 4 h |
 
 If the deadline moves:

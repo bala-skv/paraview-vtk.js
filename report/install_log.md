@@ -62,3 +62,20 @@ Evidence for the report. Failures are recorded as they happened.
 
 ## 2026-10-28 Server memory growth while switching pipelines (observation, not isolated)
 Showcase B on :8130 (wavelet 128, one browser): "Server RSS" went 746 MB (initial Contour) -> 822 (Slice) -> 1007 (Clip) -> 1244 (Threshold) -> 1448 (Streamlines) -> 1514 (Glyph) -> 1610 -> 1673 -> 1676 MB (colour, volume, local slice) over about 10 pipeline changes. Memory did not fall back when returning to Contour. Cause not investigated (new proxies per change? ParaView caches?). Earlier agent log also noted ~100 MB per newly opened page. Do not claim a leak without a controlled test; report as an observation.
+
+## 2026-10-28 Orbit re-check (server-side Benchmark orbit, 180 steps x 2 deg, remote, wavelet 128, headed Chrome 151, Iris Xe)
+Script: `report/extras/orbit_recheck.mjs` (puppeteer, real window, port 8140, fresh profile each run). The student's interactive run had logged 867 ms/step (156 s).
+
+| Run | Browser condition | ms/step |
+|---|---|---|
+| 1 | headed, real window 1258x574, Puppeteer default flags (background throttling DISABLED), first run of the session | **363.3** (65 s); pvpython CPU 0.1 % (idle) |
+| 2-4 | same, device-metrics emulation 1593x934 / real window / maximized | 16.2-16.3 |
+| 5-8 | fresh server, first orbit and second orbit, two times | 16.3 (all four) |
+| 9 | real window, Chrome's own throttling flags ENABLED | **118.4** (21 s) |
+| 10 | same, a second tab brought to the front | 23.3 (but the harness itself waited 180 s) |
+
+Findings (facts):
+1. On the same machine, same server and same scene the orbit time varies from 16 to 363 ms/step (and 867 in the student's run). Viewport size does not explain it (16.2-16.3 at 640x480 to 1920x1080 and maximized). A cold server does not explain it (fresh-server first orbits were 16.3).
+2. In the slow runs the pvpython process was idle (0.1 % CPU): the time is spent waiting on the browser side, not rendering on the server. The server orbit loop pushes an image and waits for the client, so the measured time includes browser frame pacing.
+3. Slowness appeared in runs whose window state was uncontrolled (run 1, run 9 with throttling flags enabled), consistent with Chrome throttling a window it considers occluded or backgrounded; run 10 contradicts a simple background-tab explanation, so the cause is NOT confirmed.
+Consequence for the report: the "Benchmark orbit" figure (ms/step) is not a pure server render rate. Quote 16.3 ms/step only as "when the browser window is visible and unthrottled" and say that it varied from 16 to 867 ms/step depending on browser state; it is not evidence about render cost versus size. The scripted FPS and bytes figures in the benchmark table are unaffected (they were measured client-side).

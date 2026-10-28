@@ -114,15 +114,55 @@ Source: `report/features_d_log.md` (2026-10-28). TTK (Topology ToolKit) 1.3.0 is
 
 **[STUDENT]** Interpretation. Prompts: how does having TTK inside the ParaView binary compare with building a topology tool for vtk.js (none found in `VJ/Filters/`)? Is the numpy user-site leak a packaging problem or an environment problem? Does the persistence slider make the result easier to trust?
 
-## 6. Benchmark
+## 6. Feature comparison
 
-### 6.1 Method **[DRAFT - student to review]**
+**[DRAFT - student to review]**
+
+### 6.1 How the matrix was built
+To compare what the three systems can do, and not only how fast they are, I built a matrix of 75 capabilities in seven groups: rendering, interaction, data, architecture, collaboration and deployment, development, and server-side processing. The columns are vtk.js 37.4.6, ParaView 6.2.0 with trame 4.0.0, and the legacy ParaViewWeb applications. Each cell is one of four values: **Demonstrated** (I built or ran it, with a screenshot or log), **Documented** (supported according to an official source or the installed code, which I checked), **Not supported** (I looked and it is absent), or **Unknown** (I could not verify it). The full matrix is `report/feature_matrix.md` and goes in the appendix.
+
+### 6.2 Summary
+
+| | Demonstrated | Documented | Not supported | Unknown |
+|---|---|---|---|---|
+| vtk.js | 23 | 29 | 19 | 4 |
+| ParaView + trame | 27 | 38 | 4 | 6 |
+| Legacy ParaViewWeb | 0 | 33 | 1 | 41 |
+
+The legacy column has no demonstrated cells because I did not build or run those applications, and the official pages list no features, so most of its cells are Unknown.
+
+### 6.3 Selected differences
+*(Pick 10 to 12 rows from the matrix; suggested rows below, each marked with its matrix number.)*
+
+| Capability | vtk.js | ParaView + trame |
+|---|---|---|
+| Volume rendering (1) | Demonstrated | Demonstrated, server-side |
+| Isosurface (2) | Demonstrated, in the browser | Demonstrated, on the server |
+| Picking and probing (22) | Demonstrated | Unknown (not verified) |
+| Distance measurement (23) | Demonstrated | Documented |
+| Server-side filter catalogue (65) | About 50 filters, documented | 288 filters, documented |
+| Topology analysis (71) | Not supported | Demonstrated (TTK) |
+| Unstructured grids and AMR (41) | Not supported | Documented |
+| Shared sessions (52) | Not supported | Demonstrated |
+| Hybrid local/remote rendering (45) | Not supported | Demonstrated |
+| Static hosting, no server (57) | Demonstrated | Not supported |
+| WebXR (48) | Documented, tested only in an emulator | Documented |
+| WebGPU (47) | Documented; my probe produced no render | Not supported in trame-vtk 2.11.17 |
+
+### 6.4 Limits of this comparison
+A "Demonstrated" cell means it worked in my showcase on one machine, not that the feature is complete or fast. A "Documented" cell means a source says it exists, not that I ran it. WebXR was tested only in an emulator and WebGPU produced no render. Jupyter was not demonstrated. Rows were checked against the installed software versions listed in Section 3.
+
+**[STUDENT]** What stands out in the matrix: for example, where server-side processing adds capability that the browser cannot match, and where vtk.js is the only option (no server needed). Which differences would matter for a project like yours?
+
+## 7. Benchmark
+
+### 7.1 Method **[DRAFT - student to review]**
 
 Machine `laptop-a`: Intel i7-1185G7 (8 logical cores), 31 GB RAM, Intel Iris Xe integrated GPU (WebGL renderer `ANGLE (Intel, Mesa Intel(R) Iris(R) Xe Graphics (TGL GT2), OpenGL ES 3.2)`), Pop!_OS Linux, Chrome 151, 60 Hz display (`bench/results/sysinfo.json`, `chromeGpuInfo.txt`).
 
 Conditions: **A-local** (volume in browser), **B-local** (isosurface geometry rendered in browser), **B-remote** (images streamed from the server). Sizes 64, 128, 256 (cube edge length); 3 repetitions each, cold start per repetition. Metrics: time to first render (TTFR), median FPS, minimum 1-second FPS bin (a coarse stand-in for the 5th percentile), client JS heap, server resident memory, WebSocket bytes during the run, triangles and geometry size. A-local FPS comes from `requestAnimationFrame` over 360 frames. B runs use a scripted 10-second mouse orbit (`bench/auto_b.mjs`) with the same path every time: remote FPS is binary image frames received per second, local FPS is page animation frames per second. `ws_bytes_setup`, the cost of the one-time geometry push on a mode or size switch, is recorded separately in the row notes. Full protocol: `bench/protocol.md`.
 
-### 6.2 Validity limits **[DRAFT - student to review]**
+### 7.2 Validity limits **[DRAFT - student to review]**
 - Localhost has almost no network latency, which flatters remote rendering.
 - A (volume) and B (isosurface) are different workloads; their FPS values must not be compared with each other.
 - FPS is capped by the 60 Hz display, so values at 60 cannot rank conditions.
@@ -131,7 +171,7 @@ Conditions: **A-local** (volume in browser), **B-local** (isosurface geometry re
 - One machine, integrated GPU, Linux only.
 - Development screenshots and early tests used software GL and are not results.
 
-### 6.3 Results **[DRAFT - student to review]** (medians over 3 repetitions; `results_table.md`, Figures `fig_fps_by_size.png`, `fig_ttfr_bytes.png`)
+### 7.3 Results **[DRAFT - student to review]** (medians over 3 repetitions; `results_table.md`, Figures `fig_fps_by_size.png`, `fig_ttfr_bytes.png`)
 
 | condition | size | ttfr_ms | fps_median | fps_p5 | client_mem_mb | server_rss_mb | ws_bytes | triangles | geometry_kb |
 |---|---|---|---|---|---|---|---|---|---|
@@ -149,35 +189,29 @@ Observations stated as facts only: B-local holds the 60 Hz cap at all sizes and 
 
 **[STUDENT]** Results discussion. Prompts: what does the flat remote FPS say (input throttle, not rendering)? What is the trade-off between a one-time 3–50 MB geometry push and a steady ~4 MB/10 s image stream, and where would it break (larger data, real network)? Why does A-local fall to 30 fps only at 256³? What would change on a discrete GPU or a remote server? Include `figures/b_devtools_ws.png` when taken.
 
-### 6.4 Feature coverage **[DRAFT - student to review]**
-
-`report/feature_matrix.md` lists 75 capabilities (rows 1-70 and the added rows 71-75) for vtk.js 37.4.6, ParaView 6.2.0 + trame 4.0.0 and legacy ParaViewWeb, with each cell marked Demonstrated (built here, file linked), Documented (source named), Not supported or Unknown. Counts computed by script from the table (Demonstrated / Documented / Not supported / Unknown): vtk.js 23 / 29 / 19 / 4; ParaView + trame 27 / 38 / 4 / 6; legacy ParaViewWeb 0 / 33 / 1 / 41 (nothing legacy was built or run, and most legacy cells are Unknown because the Visualizer, Lite and Divvy pages list no features). Before Streams A, B and D landed the Demonstrated counts were 12, 20 and 0. Not demonstrated: Jupyter embedding; WebGPU (partial, no render obtained, headless only). Evidence for each Demonstrated cell is a `report/figures/feat_*.png` or run output in `features_a_log.md`, `features_b_log.md` or `features_d_log.md`.
-
-**[STUDENT]** What the matrix does and does not show. Prompts: a "Demonstrated" count measures what was built in this project, not what each system can do; how should a reader weigh Documented cells?
-
-## 7. ISO/IEC 25010 evaluation
+## 8. ISO/IEC 25010 evaluation
 
 **[STUDENT]** Score each characteristic for each showcase and justify it in one or two sentences. Evidence is tabulated per characteristic in `report/iso25010_evidence.md` (functional suitability, performance efficiency, compatibility, usability, reliability, security, maintainability, portability). Facts you can use: Firefox and Windows were not verified; wslink has no authentication or TLS by design here; versions are pinned with lock files; the trame-vtk serializer gap needed a workaround.
 
-## 8. Munzner nested-model analysis
+## 9. Munzner nested-model analysis
 
 **[STUDENT]** For each showcase give the four levels: domain situation (who, what data), data/task abstraction (3D scalar volume; explore structure; compare iso-levels), visual encoding and interaction idiom (direct volume rendering with transfer function; isosurface; slice; orbit/zoom), and algorithm (GPU ray casting in WebGL2; marching-cubes contour on the server; image compression and streaming). Discuss where each level's choices constrain the next.
 
-## 9. Advantages and disadvantages
+## 10. Advantages and disadvantages
 
 **[STUDENT]** All content. Draw on Sections 3–7 for evidence. A starting checklist: install effort; interactivity; data transfer; server and client requirements; scalability to large data; maintenance status; security; documentation quality.
 
-## 10. Legacy ParaViewWeb (background note)
+## 11. Legacy ParaViewWeb (background note)
 
 **[DRAFT - student to review]** The instructor-approved scope covers vtk.js and ParaView/trame; the legacy ParaViewWeb applications are mentioned only for context and were **not built or run** (details: `legacy_desk_note.md`). The `Kitware/paraviewweb` README states that the repository is in maintenance mode, not adding features, and points to trame (references #1, verified). The ParaView 5.13.0 release notes (kitware.com, announcement dated 2024-08-23) state that the web applications divvy, lite and visualizer were removed and are "not bundled with ParaView anymore" (references #2, verified); the same release added the `--venv` option to the executables. The earlier ParaView Discourse thread (2024-05-07, by a Kitware developer) was a *proposal* ("strongly considering removal"), not an announcement of a decision, so cite the release notes for the removal. LightViz's own README says it "has been deprecated and is no longer supported" (no date). In the installed ParaView 6.2.0, `paraview/apps/` contains only `trame.py`, a `glance.py` stub and `packages.py`. No source read names a drop-in trame replacement for Visualizer, Lite or Divvy.
 
 **[STUDENT]** One paragraph on what this means for a project that starts today.
 
-## 11. Research gaps and future work
+## 12. Research gaps and future work
 
 **[STUDENT]** All content. Material from this project: trame-vtk lagging ParaView's data model (silent failure); no hybrid decision aid (which mode is faster for a given data size and network?); WebGPU in vtk.js still tracking WebGL parity (references #4, #5); VTK.wasm local rendering via trame-vtklocal (references #6); benchmarking only on localhost; large-data and multi-user (launcher) deployments were not tested.
 
-## 12. Conclusion and recommendations
+## 13. Conclusion and recommendations
 
 **[STUDENT]** All content.
 

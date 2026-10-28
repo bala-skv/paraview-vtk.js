@@ -30,3 +30,6 @@ Originals are in `screenshots/` (timestamped names); copies with final names are
 | `b_devtools_ws.png` | **missing** | DevTools Network > WS during a 10 s orbit |
 
 Facts visible in the shots that the report can cite: Showcase A on 256^3 foot/aneurism holds 39-46 fps mean at 1593x934 (tooth 1.5 M voxels: 60); load times 142-289 ms; GPU memory 16.8 MB (256^3) vs 1.6 MB (tooth).
+
+## Real-GPU Tools shots (2026-10-28, Showcase A, foot_128, Bone preset, headed Chrome, ANGLE Intel Iris Xe)
+`report/figures/real_a_{iso,probe,measure,clip,legend_axes,tf_editor}.png`, captured with `report/extras/real_gpu_tools_shots.mjs` (page screenshots; the WebGL renderer string is Iris Xe, not SwiftShader). The 3-slice view (`feat_a_mpr.png`, software GL) was retaken but its planes render black at the mid indices on foot_128, so no real-GPU shot of it is used; the dev shot on tooth is the better one.

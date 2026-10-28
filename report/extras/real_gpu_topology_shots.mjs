@@ -1,9 +1,9 @@
 // Dev screenshots of showcase-b/app_topology.py: node shot_topology.mjs  (needs the app on :8120)
 import puppeteer from 'puppeteer-core';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const out = (n) => '/tmp/claude-1000/-home-bala-myfiles-sem5-Scientific-Vis-evaluation-of-vis/17d6b472-fba6-4471-83f1-2c1871ab7ed7/scratchpad/realb/topo_' + n + '.png';
+const out = (n) => (process.argv[2] ?? '.') + '/topo_' + n + '.png';
 const b = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: false,
-  defaultViewport: { width: 1500, height: 950 }, userDataDir: '/tmp/claude-1000/-home-bala-myfiles-sem5-Scientific-Vis-evaluation-of-vis/17d6b472-fba6-4471-83f1-2c1871ab7ed7/scratchpad/realb/profile_t', args: ['--no-sandbox', '--no-first-run'] });
+  defaultViewport: { width: 1500, height: 950 }, userDataDir: (process.argv[2] ?? '.') + '/profile_t', args: ['--no-sandbox', '--no-first-run'] });
 const p = await b.newPage();
 p.on('console', (m) => { if (m.type() === 'error') console.log('console.error', m.text()); });
 await p.goto('http://localhost:8120/', { waitUntil: 'load', timeout: 120000 });

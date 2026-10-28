@@ -7,7 +7,7 @@ There are two showcases that share datasets and a benchmark harness:
 * **Showcase A** renders a volume entirely in the browser with vtk.js (WebGL2). There is no server code.
 * **Showcase B** runs a ParaView pipeline on a trame server. You can switch live between two modes: the server renders and streams images (remote), or the server sends the geometry once and the browser renders it (local).
 
-The original design is in [`DESIGN.md`](DESIGN.md).
+The written report is [`report/EVALUATION OF VISUALISATION SYSTEMS.pdf`](report/EVALUATION%20OF%20VISUALISATION%20SYSTEMS.pdf). The original design is in [`DESIGN.md`](DESIGN.md).
 
 | Showcase A: vtk.js volume viewer | Showcase B: trame + ParaView |
 | --- | --- |

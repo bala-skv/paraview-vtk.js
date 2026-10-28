@@ -5,7 +5,7 @@ Marking: `[DRAFT - student to review]` = factual text drafted by the agent. `[ST
 ## 1. Introduction and scope
 - [DRAFT - student to review] The project evaluates vtk.js (client-side rendering) and ParaView 6.2.0 with trame/wslink (server-side and hybrid rendering) as of October 2026. Legacy ParaViewWeb apps are covered as a desk study only (section 10).
 - [STUDENT] Motivation and research questions.
-- Evidence: `DESIGN.md` (Context and scope), `references.md` #1-#2.
+- Evidence: the project scope in the README, `references.md` #1-#2.
 
 ## 2. Background and architecture
 - [DRAFT - student to review] Showcase A is a static Vite app: vtk.js renders a volume in the browser with WebGL2. Showcase B is a trame app under pvpython: in remote mode the server renders and streams images over a wslink WebSocket; in local mode it sends geometry and vtk.js renders it.

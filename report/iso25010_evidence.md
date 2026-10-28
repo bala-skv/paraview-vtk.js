@@ -9,6 +9,6 @@ Evidence pointers only. The score column is intentionally empty: scores and just
 | Compatibility | Chrome tested; Firefox NOT verified (headless check inconclusive) | Python-minor match with ParaView; pip `vtk` conflict guard | `scripts/check_env.py`; `setup/versions.md`; `report/install_log.md` | |
 | Usability (interaction capability) | Control panel, FPS overlay, drag-and-drop | Toolbar, stats card, mode switch | `report/figures/` screenshots; SUS study only if extra E3 is run | |
 | Reliability | Vite `events` alias fix needed before first load | Remote vs local failure modes; fallback `app_vtk.py` | `report/install_log.md`; `scripts/run_b_fallback.*` | |
-| Security | Static files only, no server code | wslink WebSocket on an open port; no auth/TLS by design (non-goal) | `DESIGN.md` non-goals; `--host 0.0.0.0` option in run scripts | |
+| Security | Static files only, no server code | wslink WebSocket on an open port; no auth/TLS by design (non-goal) | the project's stated non-goals (no authentication or TLS); `--host 0.0.0.0` option in run scripts | |
 | Maintainability | Pinned versions, `package-lock.json`, small modules | Pinned `requirements-*.txt`; dependence on trame-vtk serializer coverage | `setup/versions.md`; `showcase-b/app.py` workaround comment; ParaViewWeb maintenance-mode notice (`references.md` #1) | |
 | Portability | Runs on any WebGL2 browser; tested on Linux only | Linux tested; Windows `.ps1` scripts written but untested | `scripts/*.ps1`; clean-room test result (M5) | |

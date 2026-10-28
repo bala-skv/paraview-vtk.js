@@ -69,6 +69,59 @@ If PowerShell refuses to run scripts: `Set-ExecutionPolicy -Scope CurrentUser Re
 
 **Fallback.** `run_b_fallback` runs the same UI and state on plain VTK in `.venv`, no ParaView needed.
 
+## Features
+
+Details, run output and the vtk.js API or ParaView call behind each item are in `report/features_a_log.md`, `report/features_b_log.md` and `report/features_d_log.md`; the comparison with ParaView/legacy ParaViewWeb is in `report/feature_matrix.md`. The feature screenshots (`report/figures/feat_*.png`) are development shots from headless Chrome with software GL.
+
+**Showcase A (vtk.js).** Open the collapsible **Tools** section of the control panel.
+
+| Tool | What it does |
+| --- | --- |
+| Isosurface | ImageMarchingCubes in the browser; slider recomputes on release; shows triangle count and compute time |
+| Orthogonal slices | I, J and K slices together with the volume |
+| Probe | Click the 3D view: world position, IJK and nearest-voxel value |
+| Clipping | Min/max planes per axis on the volume and isosurface (six clipping planes) |
+| Legend and axes | Scalar bar and orientation axes widget |
+| Transfer function editor | Tick "Edit opacity" to drag Gaussian opacity handles (overrides the preset opacity) |
+| Mesh | "Load sample torus (.obj)", the file input, or drop a `.vtp`/`.stl`/`.obj` on the page (only `.obj` tested) |
+| Measure and export | "Distance line" (two clicks, world units, on a camera-facing plane) and "Save screenshot (PNG)" |
+| WebGPU probe | Open `?api=webgpu` to select the WebGPU view and add a WebGPU row to the info list (partial, see limits) |
+
+**Showcase B (trame + ParaView).** Open the **Pipeline drawer** with the hamburger icon.
+
+| Section | What it does |
+| --- | --- |
+| Source | Wavelet, or "VTI file" from `data/vti` (default `foot_64.vti`) |
+| Filter | Contour, Slice, Clip, Threshold, Streamlines or Glyph (Streamlines and Glyph use a Gradient vector array) |
+| Colouring | Colour-by array, 9 colour maps, auto or manual range, scalar bar (remote mode only) |
+| Volume rendering | Server-side volume rendering of the source; remote mode only |
+| Session | Screenshot, Save state, Load state (restores the app's own `showcase-b/out/state.json`; the `.pvsm` is written but not reloaded) |
+
+Several browsers can open the same server and share one session (one filter, one camera, one image stream); there is no per-user isolation. The old toolbar, local/remote switch and Benchmark orbit are unchanged.
+
+**Topology app (`showcase-b/app_topology.py`).** A separate trame app that uses TTK 1.3.0, bundled in the ParaView 6.2.0 binary as the `TopologyToolKit` plugin (no extra packages). Sources: Wavelet, a 5-Gaussian field with a known answer, or any `data/vti/*.vti` (resampled to N^3, default 48). It computes persistence pairs, shows critical points (minima, saddles, maxima) over a mid slice, and draws the persistence diagram as an SVG; the persistence slider is applied on release. Linux:
+
+```bash
+export PVPYTHON=$HOME/opt/ParaView-6.2.0-MPI-Linux-Python3.12-x86_64/bin/pvpython
+$PVPYTHON --venv .pvenv showcase-b/app_topology.py --port 8120 --server [--res 48]
+# open http://localhost:8120/   (first computation takes about 5 to 8 s)
+$PVPYTHON --venv .pvenv showcase-b/validate_topology.py   # headless check, prints PASS/FAIL
+```
+
+No Windows wrapper script or Windows command has been written or tested for this app. `app_topology.py` was run only on Linux.
+
+### Known limits
+
+* WebGPU is partial: in headless Chrome the adapter was a software one, the console showed "No input!" errors and the tab closed, so no WebGPU render was obtained. Not tested on a real GPU.
+* Jupyter embedding was not demonstrated: `trame-jupyter-extension` would add about 90 packages to `.pvenv`, which the benchmark depends on, so it was not installed.
+* Windows and Firefox/Edge are untested, for the features as well as the base apps.
+* The browser isosurface (ImageMarchingCubes) runs on the main thread and blocks the page while it computes; 256^3 volumes were not timed.
+* Showcase B scalar bar and volume rendering exist in remote mode only. Local mode colours the geometry but has no scalar bar.
+* The persistence diagram in the topology app is the app's own SVG, not a ParaView chart view. Persistence is computed on the resampled N^3 grid.
+* `TTKPersistenceDiagram` without an explicit `ScalarField` crashed pvpython (segmentation fault); the app always passes it.
+* `pvpython --venv .pvenv` may import numpy from `~/.local` (user site) instead of ParaView's bundled numpy (`features_d_log.md`).
+* `bench/results/server_events.csv` contains rows from the feature tests, mixed with benchmark rows (filter by timestamp).
+
 ## Reproducing the benchmark
 
 Follow [`bench/protocol.md`](bench/protocol.md): Showcase A runs automatically with `?bench=1&data=foot_128.vti&frames=360&reps=3`; Showcase B runs use `bench/auto_b.mjs` (scripted orbit) or DevTools. Rows go into `bench/results/results.csv` through `bench/add_row.py`, and `bench/plot_results.py` builds the figures and `results_table.md`. Two validity limits apply: localhost has almost no network latency, and A (volume) and B (isosurface) must not be ranked against each other.
@@ -117,12 +170,15 @@ Volumes come from the [Open Scientific Visualization Datasets](https://klacansky
 
 ```
 README.md, DESIGN.md, LICENSE
-setup/       requirements-pv.txt, requirements-tools.txt, versions.md
+setup/       requirements-pv.txt, requirements-tools.txt, requirements-topology.txt, versions.md
 scripts/     setup, run_a, run_b, run_b_fallback (.sh and .ps1), check_env.py
 data/        manifest.json, fetch_data.py, raw_to_vti.py (raw/ and vti/ are git-ignored)
-showcase-a/  Vite + vtk.js: src/main.js, viewer.js, presets.js, ui.js, bench.js, verify_vti.mjs
-showcase-b/  app.py (ParaView), app_vtk.py (fallback), ui.py (shared layout and instrumentation)
-bench/       protocol.md, sysinfo.py, add_row.py, plot_results.py, auto_b.mjs, results/
-report/      outline, install_log, ISO 25010 evidence, screenshots, references, slides, demo script, figures/
-docs/        progress.md
+showcase-a/  Vite + vtk.js: src/main.js, viewer.js, presets.js, ui.js, bench.js, tools/ (index.js, mesh.js, webgpu.js),
+             verify_vti.mjs, gen_sample_mesh.mjs, public/mesh/sample_torus.obj
+showcase-b/  app.py (ParaView), app_vtk.py (fallback), ui.py (shared layout, instrumentation, Pipeline drawer),
+             app_topology.py (TTK topology app), validate_topology.py
+bench/       protocol.md, sysinfo.py, add_row.py, plot_results.py, auto_b.mjs, shot_topology.mjs, results/
+report/      outline, install_log, ISO 25010 evidence, screenshots, references, slides, demo script, feature_matrix,
+             features_a_log, features_b_log, features_d_log, figures/ (feat_*.png are the feature screenshots)
+docs/        progress.md, feature_plan.md
 ```

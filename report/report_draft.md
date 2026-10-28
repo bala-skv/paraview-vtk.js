@@ -15,7 +15,9 @@ This report evaluates web-based scientific visualization with the Kitware stack 
 2. **ParaView 6.2.0 with trame/wslink** for server-side and hybrid rendering (Showcase B: an isosurface app with a switch between server-rendered images and client-rendered geometry).
 3. A benchmark comparing local (browser) and remote (server) rendering on one machine.
 
-The deliverables are the two showcases, scripts and instructions that reproduce them (`README.md`, `scripts/`), and this report.
+4. A feature comparison: tools added to both showcases, a separate TTK topology app, and a feature matrix (`report/feature_matrix.md`) that marks each capability for vtk.js, ParaView/trame and legacy ParaViewWeb as Demonstrated, Documented, Not supported or Unknown (Sections 4, 5, 5.1 and 6.4).
+
+The deliverables are the two showcases, the topology app, scripts and instructions that reproduce them (`README.md`, `scripts/`), the feature matrix and its logs, and this report.
 
 **[STUDENT]** Motivation and research questions. Suggested prompts: What decision should a reader be able to make after this report (when to render in the browser vs on a server)? Which questions did you set out to answer (installation effort, interactive performance, data transfer, maintainability)?
 
@@ -60,7 +62,20 @@ Datasets are the Open SciVis datasets (references #10), converted to `.vti`: foo
 
 Figures: `figures/a_preset_grayscale.png`, `a_preset_bone.png`, `a_preset_vessel.png`, `a_slice.png` (and `a_slice_with_volume.png`), `a_fps_overlay.png`.
 
-**[STUDENT]** Observed image quality, usability and limits. Prompts: Do the presets bring out the anatomy? Is interaction smooth at 256³? What could not be done (no server-side data processing, data must fit browser/GPU memory)?
+*Tools section (added 2026-10-28; log `features_a_log.md`).* A collapsible "Tools" section in the control panel adds, with vtk.js 37.4.6 unchanged and no new npm dependencies:
+- **Isosurface** (`ImageMarchingCubes`; slider recomputes on release; triangle count and time shown). On foot_64, value 102 gave 26,032 triangles in 63 ms. The filter runs on the main thread; 256^3 volumes were not timed. Figure `feat_a_isosurface.png`.
+- **Three orthogonal slices** (I, J, K with the volume), `feat_a_mpr.png`.
+- **Probe** (`CellPicker`): world position, IJK and nearest-voxel value; foot_64 test returned IJK (32, 32, 37), value 198. `feat_a_probe.png`.
+- **Clipping**: six planes (min/max per axis) on the volume and isosurface; slices and meshes are not clipped. A cropping widget was not used. `feat_a_clip.png`.
+- **Scalar bar and orientation axes** (`ScalarBarActor`, `OrientationMarkerWidget`), `feat_a_legend_axes.png`.
+- **Transfer-function editor** (`PiecewiseGaussianWidget`): edits opacity only and overrides the preset opacity while ticked. `feat_a_tf_editor_dragged.png`.
+- **Mesh loading**: sample torus (.obj, 2304 triangles), file input or drag-and-drop; `.obj` tested, `.vtp` and `.stl` code paths present but not exercised. `feat_a_mesh.png`.
+- **Distance line** (`LineWidget`; two points on a camera-facing plane, 83.74 world units on foot_64) and **screenshot export** (PNG data URL of about 1.2 MB; the downloaded file was not opened). `feat_a_measure.png`.
+- **WebGPU probe** (`?api=webgpu`): partial. In headless Chrome with `--enable-unsafe-webgpu` the adapter was a software one (swiftshader); the console showed "No input!" errors and the tab closed, so no WebGPU render was obtained and there is no screenshot. Not tested on a real GPU.
+
+The feature screenshots are headless Chrome with software GL on foot_64: they show correctness, not speed.
+
+**[STUDENT]** Observed image quality, usability and limits. Prompts: Do the presets bring out the anatomy? Is interaction smooth at 256³? What could not be done (no server-side data processing, data must fit browser/GPU memory)? Is the main-thread isosurface acceptable at 256³? Did the Tools section make the viewer easier or harder to use?
 
 ## 5. Showcase B: trame + ParaView, remote and local rendering
 
@@ -69,9 +84,35 @@ The UI (Vuetify single-page layout) has an iso-value slider, a size selector (64
 
 At 128³ and iso 160 the isosurface has 271,408 triangles and about 12.2 MB of geometry (Figures `b_remote.png`, `b_local.png`). Geometry sizes by volume size: 64³ → 66,260 triangles, 3.0 MB; 128³ → 272,634 triangles, 12.3 MB; 256³ → 1,103,026 triangles, 49.6 MB (median rows in `results.csv`).
 
+*Pipeline drawer (added 2026-10-28; log `features_b_log.md`).* The hamburger icon opens a "Pipeline" drawer (built only for the ParaView app; `app_vtk.py` is unchanged and still starts). All screenshots are headless Chrome with software GL on a 64^3 wavelet unless noted.
+- **Filter selector**: Contour, Slice, Clip, Threshold, Streamlines (150 point-cloud seeds) and Glyph (arrows); Streamlines and Glyph use a `Gradient` vector array computed from RTData. All six render in local mode as well (local updates took 2-4 s each under software GL). Figures `feat_b_pipeline_selector.png`, `feat_b_streamlines.png`, `feat_b_local_pipelines.png`.
+- **Colouring**: colour-by array, 9 colour maps, auto or manual range, scalar bar. The scalar bar is a server-side widget: present in remote mode, absent in local mode. Contour output of RTData carries RTData as a constant, so an `Elevation` filter is added for colouring. `feat_b_colour.png`.
+- **Server-side volume rendering** (`Representation = "Volume"`), remote mode only; 0.4-1.3 s per update at 64^3; not tried at 256^3. `feat_b_volume.png`.
+- **`.vti` source** (`XMLImageDataReader` on `data/vti`): foot_64 with Contour iso 90 gave 29,027 triangles; 256^3 files were not tried. `feat_b_vti_source.png`.
+- **Screenshot, save and load state**: `SaveScreenshot` (shown in a dialog and written to `showcase-b/out/`) and `SaveState` (`.pvsm`). Load state restores only the app's own `state.json`, not the `.pvsm`. `feat_b_screenshot.png`, `feat_b_save_load_state.png`.
+- **Multi-client**: two Chrome pages on one server shared filter, colour, statistics and camera; there is no per-user session, and server memory grew by roughly 100 MB per added page in the first runs (not isolated further). The "clients connected" counter only increments. `feat_b_multiclient.png`.
+- **Jupyter**: not demonstrated. The package is `trame-jupyter-extension`; a dry run would add about 90 packages to `.pvenv`, so it was not installed.
+- After these changes `bench/auto_b.mjs --mode remote --size 64 --rep 1 --seconds 3 --headless` still produced a RESULT line (ws_bytes 935,624, fps_median 17, triangles 66,260). Test events were appended to `bench/results/server_events.csv` and are mixed with benchmark rows.
+
 **Finding: local mode was blank with ParaView 6.2.0 + trame-vtk 2.11.17.** Remote mode and the plain-VTK fallback worked, with no error in the server log or browser console. About 40 minutes of debugging located the cause: ParaView 6.2 mappers take a `vtkPartitionedDataSetCollection`, and trame-vtk 2.11.17 has no serializer for that class, so every actor is silently dropped from the vtk.js scene. The workaround in `showcase-b/app.py` registers an existing serializer for the class (`register_instance_serializer("vtkPartitionedDataSetCollection", merge_to_polydata_serializer)`).
 
-**[STUDENT]** Interpretation. Prompts: What does the silent failure say about the maturity of the hybrid path? What does the local/remote switch feel like to use? Which mode would you pick for this scene and why (use the data in Section 6)?
+**[STUDENT]** Interpretation. Prompts: What does the silent failure say about the maturity of the hybrid path? What does the local/remote switch feel like to use? Which mode would you pick for this scene and why (use the data in Section 6)? Which features worked in only one mode (scalar bar, volume rendering), and does that matter? What does the shared-session behaviour mean for a multi-user deployment?
+
+### 5.1 Topology analysis with TTK **[DRAFT - student to review]**
+
+Source: `report/features_d_log.md` (2026-10-28). TTK (Topology ToolKit) 1.3.0 is bundled in the ParaView 6.2.0 binary as the `TopologyToolKit` plugin (173 files, about 77 MB; `share/paraview-6.2/spdx/ttk.spdx` names `ttk-1.3.0-trimmed.zip`). The plugin is not auto-loaded; `simple.LoadPlugin("TopologyToolKit", remote=False, ns=globals())` took 6.6 s on first load and `ldd` showed no missing libraries. Nothing was installed. For comparison, the conda-forge `topologytoolkit` 1.3.0 builds depend on ParaView 5.13 or VTK 9.4 and so do not match ParaView 6.2.0/VTK 9.7 (not installed); there is no PyPI package (404).
+
+*App method.* `showcase-b/app_topology.py` (port 8120; run with `$PVPYTHON --venv .pvenv showcase-b/app_topology.py --port 8120 --server`) takes a Wavelet, a 5-Gaussian field with a known answer, or a `data/vti` volume resampled to N^3 (default N=48), runs `TTKPersistenceDiagram` once per source, and then selects the critical points whose persistence is at least a slider fraction (0 to 30 %) of the scalar range. Selection is numpy code on the server; the slider does not rerun TTK. Points are drawn as coloured spheres (blue minimum, green 1-saddle, yellow 2-saddle, red maximum) over a translucent mid slice and are streamed by `VtkRemoteView`. The persistence diagram is an SVG string built by the app and pushed as trame state; it is not a TTK or ParaView chart view. Only `TTKPersistenceDiagram` is used in the app; `TTKTopologicalSimplificationByPersistence` and `TTKScalarFieldCriticalPoints` are used only in the validation script, because the saddles they report on the simplified field stay in the thousands (10,918 1-saddles on the 1 % noise field at thresholds of 2 % and above) while minima and maxima drop as expected.
+
+*Validation* (`showcase-b/validate_topology.py`, N=48, sum of 5 Gaussians scaled to 0-100). With the app method, 5 maxima remain at thresholds of 5 % and 10 % for both 0 % and 1 % noise (also at 2 % with 1 % noise); the script prints `OVERALL PASS`. At threshold 0 the 1 % noise field has 3,191 maxima (TTK). An independent numpy 26-neighbour check found 5 maxima on the noise-free field (equal to TTK) and 1,465 on the noisy field; the difference was not investigated. On the noise-free field 14 minima appear at threshold 0 (flat tails and corners) and one remains from 0.5 %. The Wavelet and the aneurism volume have no known answer and were not cross-checked (Wavelet: 1,162 pairs; aneurism resampled to 48^3: 1,049 pairs).
+
+*Timings* (software GL, 8 threads, N=48): source plus persistence diagram 2.5 to 4.9 s (diagram alone 0.9 to 1.5 s); a threshold change 0.03 to 0.6 s. N above 96 and a real GPU were not measured.
+
+*Gotchas.* (1) `TTKPersistenceDiagram` without an explicit `ScalarField` printed "Unable to retrieve input scalar array" and segfaulted pvpython; always pass `ScalarField=["POINTS", "<array>"]`. (2) `pvpython --venv .pvenv` imported numpy 2.4.3 from `~/.local` instead of the bundled 1.26.4, which breaks the bundled scipy; the app uses only numpy and vtk. `PYTHONNOUSERSITE=1` was not tried. (3) `simple.ColorBy(display, None)` raised an error on a Threshold output; the app sets `ColorArrayName = ["POINTS", ""]`. (4) The Chrome console shows one `405 Method Not Allowed` on page load (not investigated).
+
+*Limits.* Persistence is computed on the resampled grid, not the full-resolution volume. Morse-Smale complex, contour tree and merge trees were not tried. Windows (whether the Windows binary bundles the plugin is unverified), Firefox/Edge, MPI with more than one rank and local (vtk.js) rendering were not tested. Figures (software GL dev shots): `feat_d_wavelet_th002.png`, `feat_d_wavelet_th008.png`, `feat_d_gaussians_th005.png`, `feat_d_gaussians_maxima_only.png`, `feat_d_aneurism.png`. The SVG header text overlaps the top-most diagram points in these shots.
+
+**[STUDENT]** Interpretation. Prompts: how does having TTK inside the ParaView binary compare with building a topology tool for vtk.js (none found in `VJ/Filters/`)? Is the numpy user-site leak a packaging problem or an environment problem? Does the persistence slider make the result easier to trust?
 
 ## 6. Benchmark
 
@@ -107,6 +148,12 @@ Conditions: **A-local** (volume in browser), **B-local** (isosurface geometry re
 Observations stated as facts only: B-local holds the 60 Hz cap at all sizes and sends 0 bytes during the orbit (the geometry push happened at setup: 3.0, 12.3 and 49.6 MB). B-remote sends about 4 MB per 10-second orbit at every size and shows about 20 fps at every size. A-local holds the cap at 64 and 128 and drops to a median of 30 fps (minimum bin 25.6) at 256. Server resident memory rises with size (709 → 958 MB local, 732 → 980 MB remote). The server-side orbit (180 steps) took 2.90–2.93 s at all sizes in the scripted headless-style runs (about 16 ms/step); **one interactive run in the student's own browser logged 867 ms/step (156 s total)**, which is unexplained and is under re-test (`install_log.md`, 2026-10-28). Do not cite the 16 ms/step figure until that is resolved.
 
 **[STUDENT]** Results discussion. Prompts: what does the flat remote FPS say (input throttle, not rendering)? What is the trade-off between a one-time 3–50 MB geometry push and a steady ~4 MB/10 s image stream, and where would it break (larger data, real network)? Why does A-local fall to 30 fps only at 256³? What would change on a discrete GPU or a remote server? Include `figures/b_devtools_ws.png` when taken.
+
+### 6.4 Feature coverage **[DRAFT - student to review]**
+
+`report/feature_matrix.md` lists 75 capabilities (rows 1-70 and the added rows 71-75) for vtk.js 37.4.6, ParaView 6.2.0 + trame 4.0.0 and legacy ParaViewWeb, with each cell marked Demonstrated (built here, file linked), Documented (source named), Not supported or Unknown. Counts computed by script from the table (Demonstrated / Documented / Not supported / Unknown): vtk.js 23 / 29 / 19 / 4; ParaView + trame 27 / 38 / 4 / 6; legacy ParaViewWeb 0 / 33 / 1 / 41 (nothing legacy was built or run, and most legacy cells are Unknown because the Visualizer, Lite and Divvy pages list no features). Before Streams A, B and D landed the Demonstrated counts were 12, 20 and 0. Not demonstrated: Jupyter embedding; WebGPU (partial, no render obtained, headless only). Evidence for each Demonstrated cell is a `report/figures/feat_*.png` or run output in `features_a_log.md`, `features_b_log.md` or `features_d_log.md`.
+
+**[STUDENT]** What the matrix does and does not show. Prompts: a "Demonstrated" count measures what was built in this project, not what each system can do; how should a reader weigh Documented cells?
 
 ## 7. ISO/IEC 25010 evaluation
 

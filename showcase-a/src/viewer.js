@@ -22,7 +22,7 @@ export function parseVti(arrayBuffer) {
 // api: undefined = default WebGL2 view, 'WebGPU' = experimental WebGPU view (see tools/webgpu.js)
 export function createViewer(container, { fps = false, api } = {}) {
   const fsrw = vtkFullScreenRenderWindow.newInstance({
-    ...(api ? { viewAPI: api } : {}),
+    ...(api ? { defaultViewAPI: api } : {}),
     rootContainer: container,
     containerStyle: { position: 'absolute', inset: '0' },
     background: [0.08, 0.08, 0.12],

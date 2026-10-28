@@ -51,7 +51,7 @@ export function initTools(viewer, body, ui) {
       <output class="res"></output>`);
     const mc = vtkImageMarchingCubes.newInstance({ contourValue: 100, computeNormals: true, mergePoints: true });
     const mapper = vtkMapper.newInstance({ scalarVisibility: false });
-    mapper.setInputConnection(mc.getOutputPort());
+    let connected = false; // connected on first use: an input-less mapper logs errors under the WebGPU view
     const actor = vtkActor.newInstance();
     actor.setMapper(mapper);
     actor.getProperty().setColor(0.9, 0.75, 0.55);
@@ -64,6 +64,7 @@ export function initTools(viewer, body, ui) {
       const t = performance.now();
       mc.setContourValue(+v.value);
       mc.setInputData(image);
+      if (!connected) { mapper.setInputConnection(mc.getOutputPort()); connected = true; }
       mc.update();
       const tris = mc.getOutputData().getPolys().getNumberOfCells();
       res.textContent = `${tris.toLocaleString()} triangles, ${(performance.now() - t).toFixed(0)} ms`;
@@ -105,7 +106,15 @@ export function initTools(viewer, body, ui) {
       const r = f.$(`.s${a}`);
       r.oninput = () => { m.setSlice(+r.value); f.$(`.o${a}`).textContent = r.value; render(); };
     }
-    f.$('.on').onchange = (e) => { for (const a in slices) slices[a].s.setVisibility(e.target.checked); render(); };
+    f.$('.on').onchange = (e) => {
+      for (const a in slices) slices[a].s.setVisibility(e.target.checked);
+      if (e.target.checked) { // oblique view so the three planes are distinguishable
+        const cam = renderer.getActiveCamera();
+        cam.azimuth(35); cam.elevation(25); cam.orthogonalizeViewUp();
+        renderer.resetCameraClippingRange();
+      }
+      render();
+    };
     return {
       actors: () => Object.values(slices).map((x) => x.s),
       setImage(im) {
@@ -210,6 +219,7 @@ export function initTools(viewer, body, ui) {
     const bar = vtkScalarBarActor.newInstance();
     bar.setScalarsToColors(ctf);
     bar.setAxisLabel('Intensity');
+    bar.setDrawNanAnnotation(false);
     bar.setVisibility(false);
     renderer.addActor(bar);
     const marker = vtkOrientationMarkerWidget.newInstance({
@@ -287,8 +297,7 @@ export function initTools(viewer, body, ui) {
           handle.onInteractionEvent(show);
           handle.onEndInteractionEvent(show);
         }
-        handle.setVisibility?.(true);
-        widget.reset();
+        handle.reset?.();
         wm.grabFocus(widget);
         res.textContent = 'click two points';
       } else if (handle) {

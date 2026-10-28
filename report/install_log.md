@@ -59,3 +59,6 @@ Evidence for the report. Failures are recorded as they happened.
 ## 2026-10-28 M7 merge notes
 - `scripts/cleanroom_test.sh` false PASS found: a Vite server left over from an earlier test run kept port 5173 (listening on IPv6 `::1` only), the busy-port check only looked at IPv4, and `start A` passed against the stale server while the dataset check failed. Fixed: busy check covers `::1`; servers start in their own session and the cleanup frees the ports. Re-run: 8/8 PASS, no listeners left.
 - All feature streams merged (vtk.js tools, trame/ParaView features, feature matrix, TTK topology); details in `report/features_a_log.md`, `features_b_log.md`, `features_d_log.md`, `feature_matrix.md`.
+
+## 2026-10-28 Server memory growth while switching pipelines (observation, not isolated)
+Showcase B on :8130 (wavelet 128, one browser): "Server RSS" went 746 MB (initial Contour) -> 822 (Slice) -> 1007 (Clip) -> 1244 (Threshold) -> 1448 (Streamlines) -> 1514 (Glyph) -> 1610 -> 1673 -> 1676 MB (colour, volume, local slice) over about 10 pipeline changes. Memory did not fall back when returning to Contour. Cause not investigated (new proxies per change? ParaView caches?). Earlier agent log also noted ~100 MB per newly opened page. Do not claim a leak without a controlled test; report as an observation.

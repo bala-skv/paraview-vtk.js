@@ -33,3 +33,6 @@ Facts visible in the shots that the report can cite: Showcase A on 256^3 foot/an
 
 ## Real-GPU Tools shots (2026-10-28, Showcase A, foot_128, Bone preset, headed Chrome, ANGLE Intel Iris Xe)
 `report/figures/real_a_{iso,probe,measure,clip,legend_axes,tf_editor}.png`, captured with `report/extras/real_gpu_tools_shots.mjs` (page screenshots; the WebGL renderer string is Iris Xe, not SwiftShader). The 3-slice view (`feat_a_mpr.png`, software GL) was retaken but its planes render black at the mid indices on foot_128, so no real-GPU shot of it is used; the dev shot on tooth is the better one.
+
+## Real-GPU shots of Showcase B and the topology app (2026-10-28, headed Chrome 1500x900, Iris Xe, wavelet 128)
+`report/figures/real_b_{contour_remote,streamlines,threshold,volume,slice_remote_bar,slice_local,clip_local}.png` and `real_d_{gaussians_th005,wavelet_th002}.png`. Scripts: `report/extras/real_gpu_b_shots.mjs`, `real_gpu_topology_shots.mjs` (they were run from `bench/`; ports 8130 and 8120). Notes: `real_b_slice_local` and `real_b_clip_local` are in local mode (trame draws no scalar bar there); `real_b_volume` is server volume rendering (remote). The server renders with pvpython; "real GPU" refers to the browser's WebGL for local mode and the vtk.js views.

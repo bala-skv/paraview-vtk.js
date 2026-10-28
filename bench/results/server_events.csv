@@ -22,3 +22,13 @@ timestamp,event,source,size,mode,duration_ms,triangles,geometry_kb,rss_mb
 2026-10-26T13:50:01,orbit,wavelet,256,remote,2912.20,1103026,49615,949.0
 2026-10-26T13:50:20,orbit,wavelet,256,remote,2930.71,1103026,49615,980.9
 2026-10-26T13:50:39,orbit,wavelet,256,remote,2913.87,1103026,49615,1027.7
+2026-10-28T07:43:53,server_ready,wavelet,128,remote,953.21,272634,12279,692.2
+2026-10-28T07:43:55,first_client_connect,wavelet,128,remote,2652.56,,,702.8
+2026-10-28T07:44:06,orbit,wavelet,128,remote,2943.56,272634,12279,731.9
+2026-10-28T07:44:19,orbit,wavelet,128,remote,2901.15,272634,12279,774.7
+2026-10-28T07:44:30,orbit,wavelet,128,remote,2900.99,272634,12279,811.5
+2026-10-28T07:44:42,orbit,wavelet,128,remote,2927.70,272634,12279,911.0
+2026-10-28T07:49:57,server_ready,wavelet,128,remote,792.79,272634,12279,695.4
+2026-10-28T07:50:43,server_ready,wavelet,128,remote,774.19,272634,12279,695.4
+2026-10-28T07:50:43,first_client_connect,wavelet,128,remote,1662.70,,,705.9
+2026-10-28T07:50:55,orbit,wavelet,128,remote,2928.34,272634,12279,760.7

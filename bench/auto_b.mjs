@@ -3,7 +3,7 @@
 // add_row.py command. Needs a running Showcase B (scripts/run_b.sh --size N --mode local|remote).
 //
 //   cd bench && npm ci
-//   node auto_b.mjs --mode remote --size 128 --rep 1 [--port 8080] [--headless] [--chrome /path] [--seconds 10]
+//   node auto_b.mjs --mode remote --size 128 --rep 1 [--port 8080] [--width 1280 --height 720] [--shot card.png] [--headless] [--chrome /path] [--seconds 10]
 import puppeteer from 'puppeteer-core';
 import { existsSync } from 'node:fs';
 
@@ -14,6 +14,10 @@ const rep = Number(arg('rep', 1));
 const port = Number(arg('port', 8080));
 const seconds = Number(arg('seconds', 10));
 const headless = arg('headless', false) === true;
+const width = Number(arg('width', 1280));
+const height = Number(arg('height', 720));
+const hidden = arg('hidden', false) === true; // test: put the page in a background tab while the orbit runs
+const shot = arg('shot', ''); // optional: save a screenshot of the Server stats card after the orbit
 const emit = arg('emit', false) === true; // print one machine-readable RESULT line (used by run_all_b.sh)
 const candidates = [arg('chrome', ''), process.env.CHROME, '/usr/bin/google-chrome',
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -26,8 +30,8 @@ if (!['remote', 'local'].includes(mode)) throw new Error('--mode must be remote 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const median = (a) => { const s = [...a].sort((x, y) => x - y); return s.length ? s[Math.floor((s.length - 1) / 2)] : NaN; };
 
-const browser = await puppeteer.launch({ executablePath, headless, defaultViewport: { width: 1280, height: 720 },
-  args: ['--no-sandbox', '--window-size=1280,820', '--disk-cache-size=1', '--aggressive-cache-discard'] });
+const browser = await puppeteer.launch({ executablePath, headless, defaultViewport: { width, height },
+  args: ['--no-sandbox', `--window-size=${width},${height + 100}`, '--disk-cache-size=1', '--aggressive-cache-discard'] });
 const page = await browser.newPage();
 await page.setCacheEnabled(false);
 const cdp = await page.createCDPSession();
@@ -96,8 +100,11 @@ const out = {
 // remote mode: also press Benchmark orbit once so server_events.csv gets an 'orbit' row
 if (mode === 'remote') {
   await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /benchmark orbit/i.test(b.textContent))?.click());
-  await page.waitForFunction(() => window.trame.state.state.orbit_report, { timeout: 60000 }).catch(() => {});
+  if (hidden) { const other = await browser.newPage(); await other.goto('about:blank'); await other.bringToFront(); }
+  await page.waitForFunction(() => window.trame.state.state.orbit_report, { timeout: 300000 }).catch(() => {});
   out.orbit_report = await page.evaluate(() => window.trame.state.state.orbit_report);
+  out.viewport = `${width}x${height}`;
+  if (shot) { const card = await page.evaluateHandle(() => [...document.querySelectorAll('.v-card')].find((c) => /Server stats/.test(c.textContent))); await card.asElement()?.screenshot({ path: shot }); }
 }
 if (emit) { console.log('RESULT ' + JSON.stringify(out)); await browser.close(); process.exit(0); }
 console.log(JSON.stringify(out, null, 2));

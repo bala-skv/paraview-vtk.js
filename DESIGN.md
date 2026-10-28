@@ -9,7 +9,7 @@ Build the project milestone by milestone (M0 to M6), and start no extra until th
 Operating rules:
 
 1. Work in milestone order. Pass a milestone's acceptance checks before starting the next one.
-2. After each milestone, commit with the prefix `M<n>:` and append one line to `docs/progress.md` (date, milestone, status, blockers).
+2. After each milestone, commit with the prefix `M<n>:` and keep the commit history as the progress log (the `docs/progress.md` file was dropped on 2026-10-28).
 3. Log every install error, workaround and duration in `report/install_log.md`. The student cites this log as evaluation evidence, so record failures honestly.
 4. Verify APIs before using them. Check the installed source (`node_modules/@kitware/vtk.js`, `site-packages/trame*`) or the official examples. Never guess import paths.
 5. Pin versions as soon as something works, and record them in `setup/versions.md`.
@@ -150,14 +150,12 @@ vtkjs-pvweb-eval/
 │   ├── server_monitor.py      # psutil sampler (extra E0)
 │   ├── plot_results.py        # CSV to figures and tables
 │   └── results/               # results.csv, sysinfo.json, figures/
-├── report/
-│   ├── outline.md
-│   ├── install_log.md
-│   ├── iso25010_evidence.md
-│   ├── screenshots.md         # shot list with file names
-│   └── figures/
-└── docs/
-    └── progress.md            # one line per milestone
+└── report/
+    ├── outline.md
+    ├── install_log.md
+    ├── iso25010_evidence.md
+    ├── screenshots.md         # shot list with file names
+    └── figures/
 ```
 
 ## Data pipeline
@@ -456,7 +454,7 @@ If the deadline moves:
 
 ## Phase 3: feature coverage (added 2026-10-28)
 
-**Decision.** On 2026-10-28 the student decided that "evaluation of visualization systems" must cover what the systems can do, not only benchmarks, and asked for as many features as possible to be added quickly. This work is therefore done **before** the phase gate opens and takes priority over extras E0 to E10, except where it absorbs them (E0 `.vti` source, E7 WebGPU probe, E8 Jupyter, E6 legacy desk note). The gate itself (clean-room pass on the student's machine, report draft confirmed) is unchanged. Source of this section: `docs/feature_plan.md`; outcomes are logged in `report/features_a_log.md`, `report/features_b_log.md` and `report/feature_matrix.md`.
+**Decision.** On 2026-10-28 the student decided that "evaluation of visualization systems" must cover what the systems can do, not only benchmarks, and asked for as many features as possible to be added quickly. This work is therefore done **before** the phase gate opens and takes priority over extras E0 to E10, except where it absorbs them (E0 `.vti` source, E7 WebGPU probe, E8 Jupyter, E6 legacy desk note). The gate itself (clean-room pass on the student's machine, report draft confirmed) is unchanged. Outcomes are logged in `report/features_a_log.md`, `report/features_b_log.md` and `report/feature_matrix.md`.
 
 Why: "evaluation of visualization systems" should cover what the systems can do, not only benchmarks. Goal: widen
 the demonstrated feature set, and record the rest in a feature matrix (`report/feature_matrix.md`) as

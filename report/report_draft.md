@@ -221,4 +221,4 @@ See `report/references.md` (11 entries, each marked with how it was verified; #2
 
 ## Appendix
 
-**[DRAFT - student to review]** A. Software versions: `setup/versions.md`. B. System information: `bench/results/sysinfo.json`. C. Installation log: `report/install_log.md`. D. Raw benchmark data: `bench/results/results.csv` (27 rows). E. Progress log: `docs/progress.md`. F. Dataset credits and licence (CC BY-NC-SA 4.0): README acknowledgements and the Open SciVis Datasets site.
+**[DRAFT - student to review]** A. Software versions: `setup/versions.md`. B. System information: `bench/results/sysinfo.json`. C. Installation log: `report/install_log.md`. D. Raw benchmark data: `bench/results/results.csv` (27 rows). F. Dataset credits and licence (CC BY-NC-SA 4.0): README acknowledgements and the Open SciVis Datasets site.

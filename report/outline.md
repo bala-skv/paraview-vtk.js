@@ -60,4 +60,4 @@ Marking: `[DRAFT - student to review]` = factual text drafted by the agent. `[ST
 - [DRAFT - student to review] See `references.md`.
 
 ## Appendix
-- [DRAFT - student to review] `setup/versions.md`, `bench/results/sysinfo.json`, `install_log.md`, `docs/progress.md`, data credits from the README.
+- [DRAFT - student to review] `setup/versions.md`, `bench/results/sysinfo.json`, `install_log.md`, data credits from the README.

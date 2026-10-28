@@ -47,3 +47,7 @@ Evidence for the report. Failures are recorded as they happened.
 - Server speed varies a lot (same host measured ~31 kB/s later from the dev laptop, though it was fast earlier). Evaluation note: the datasets have a single, slow, http-only host.
 - Fix: `data/fetch_data.py` now resumes via HTTP Range, aborts an attempt averaging < 50 kB/s over 20 s, retries 6 times with resume, and prints a manual-copy fallback. Resume verified on tooth (byte-identical).
 - Fallback for a stuck machine: copy `data/raw/*.raw` from another machine/USB; sha256 is verified on the next run.
+
+## 2026-10-28 Student's interactive orbit contradicts the scripted result (OPEN)
+- `b_orbit_terminal.png` (student's real browser, Showcase B remote): `[bench] orbit: 156122 ms total, 867.3 ms/step (180 x 2 deg)`, first client connected 28599 ms after server start.
+- The scripted headless runs on the same laptop logged 2.9 s for the same orbit (16 ms/step) at all sizes. The 2026-10-26 conclusion "server renders ~62 steps/s at every size" therefore holds only for that headless setup. Possible causes (untested): larger viewport (1593x934 vs headless default), a second pvpython still holding port 8080 and competing for CPU, or pvpython rendering in software on the student's session. Do not cite the 62 steps/s figure in the report until this is re-measured with the same window size.

@@ -1,0 +1,50 @@
+# Extra E1: publish Showcase A (vtk.js) to GitHub Pages. Manual/optional; needs Settings > Pages > Source = "GitHub Actions".
+# Data: only the small tracked files in showcase-a/pages-data (tooth, foot_128) are shipped; nothing is downloaded at build time.
+name: Deploy Showcase A to GitHub Pages
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: showcase-a/package-lock.json
+      - uses: actions/configure-pages@v6
+      - name: Install
+        working-directory: showcase-a
+        run: npm ci
+      - name: Build (sub-path /<repo>/)
+        working-directory: showcase-a
+        env:
+          VITE_BASE: /${{ github.event.repository.name }}/
+        run: npm run build:pages
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: showcase-a/dist-pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -11,3 +11,5 @@ dist/
 __pycache__/
 *.pyc
 showcase-b/out/
+.jvenv/
+showcase-a/dist-pages/

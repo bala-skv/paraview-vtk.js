@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "verify-data": "node verify_vti.mjs"
+    "verify-data": "node verify_vti.mjs",
+    "build:pages": "node scripts/pages_build.mjs"
   },
   "dependencies": {
     "@kitware/vtk.js": "37.4.6",

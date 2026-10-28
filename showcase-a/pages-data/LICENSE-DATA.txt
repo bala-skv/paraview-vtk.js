@@ -1,0 +1,9 @@
+Datasets in this folder (tooth.vti, foot_128.vti) are converted copies of volumes from the
+Open Scientific Visualization Datasets collection by Pavol Klacansky
+(https://klacansky.com/open-scivis-datasets/), licensed CC BY-NC-SA 4.0
+(https://creativecommons.org/licenses/by-nc-sa/4.0/). They are redistributed here under the same
+licence (attribution, non-commercial, share-alike) and are NOT covered by the repository's BSD-3-Clause code licence.
+foot_128 is a downsampled (128^3) version of "foot". Changes: converted from raw to VTK ImageData (.vti).
+Acknowledgements:
+  foot:  volvis.org and Philips Research, Hamburg, Germany
+  tooth: GE Aircraft Engines, Evendale, Ohio, USA

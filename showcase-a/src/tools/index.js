@@ -20,6 +20,7 @@ import vtkLineWidget from '@kitware/vtk.js/Widgets/Widgets3D/LineWidget';
 import vtkPlaneManipulator from '@kitware/vtk.js/Widgets/Manipulators/PlaneManipulator';
 import { ViewTypes } from '@kitware/vtk.js/Widgets/Core/WidgetManager/Constants';
 import { initMesh } from './mesh';
+import { initXR } from '../xr';
 
 const h = (html) => {
   const t = document.createElement('template');
@@ -319,6 +320,7 @@ export function initTools(viewer, body, ui) {
     return { setImage(im) { man.setWidgetOrigin(im.getCenter()); } };
   })();
   add(measure);
+  add(initXR(viewer, body));
 
   return {
     setImage(im) { image = im; parts.forEach((p) => p.setImage?.(im)); },

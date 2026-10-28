@@ -3,6 +3,8 @@ const t0 = performance.now();
 import { createViewer, parseVti } from './viewer';
 import { buildPanel, showInfo } from './ui';
 import { runBench } from './bench';
+import { initTools } from './tools';
+import { MESH_EXT, extOf } from './tools/mesh';
 
 const root = document.getElementById('app');
 const params = new URLSearchParams(location.search);
@@ -23,6 +25,7 @@ async function main() {
   const viewer = createViewer(view, { fps: true });
   ui.preset.value = viewer.getState().preset;
   const glr = viewer.glRenderer();
+  const tools = initTools(viewer, ui.tools, ui);
 
   function syncSlice() {
     const n = viewer.sliceCount(ui.axis.value);
@@ -33,6 +36,7 @@ async function main() {
 
   function show(image, label, loadMs) {
     viewer.setImage(image);
+    tools.setImage(image);
     syncSlice();
     const d = image.getDimensions();
     showInfo(ui, [
@@ -52,8 +56,8 @@ async function main() {
   }
 
   ui.dataset.onchange = () => loadUrl(ui.dataset.value, ui.dataset.selectedOptions[0].text);
-  ui.preset.onchange = () => viewer.applyPreset(ui.preset.value);
-  ui.opacity.oninput = () => { ui.opacityOut.textContent = (+ui.opacity.value).toFixed(1); viewer.applyPreset(ui.preset.value, +ui.opacity.value); };
+  ui.preset.onchange = () => { viewer.applyPreset(ui.preset.value); tools.presetChanged(); };
+  ui.opacity.oninput = () => { ui.opacityOut.textContent = (+ui.opacity.value).toFixed(1); viewer.applyPreset(ui.preset.value, +ui.opacity.value); tools.presetChanged(); };
   ui.sample.oninput = () => { ui.sampleOut.textContent = (+ui.sample.value).toFixed(1); viewer.setSampleFactor(+ui.sample.value); };
   ui.shade.onchange = () => viewer.setShade(ui.shade.checked);
   ui.volVis.onchange = () => viewer.setVolumeVisible(ui.volVis.checked);
@@ -76,6 +80,7 @@ async function main() {
     ui.drop.classList.remove('over');
     const f = e.dataTransfer.files[0];
     if (!f) return;
+    if (MESH_EXT.includes(extOf(f.name))) { tools.loadMesh(f); return; }
     try {
       const start = performance.now();
       show(parseVti(await f.arrayBuffer()), f.name, performance.now() - start);

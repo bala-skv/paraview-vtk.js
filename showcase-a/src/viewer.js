@@ -19,8 +19,10 @@ export function parseVti(arrayBuffer) {
   return reader.getOutputData(0);
 }
 
-export function createViewer(container, { fps = false } = {}) {
+// api: undefined = default WebGL2 view, 'WebGPU' = experimental WebGPU view (see tools/webgpu.js)
+export function createViewer(container, { fps = false, api } = {}) {
   const fsrw = vtkFullScreenRenderWindow.newInstance({
+    ...(api ? { viewAPI: api } : {}),
     rootContainer: container,
     containerStyle: { position: 'absolute', inset: '0' },
     background: [0.08, 0.08, 0.12],
@@ -128,7 +130,7 @@ export function createViewer(container, { fps = false } = {}) {
   }
 
   return {
-    fsrw, renderer, renderWindow, fpsMonitor,
+    fsrw, renderer, renderWindow, fpsMonitor, volume, volMapper, slice, ctf, ofun,
     getState: () => state,
     setImage, applyPreset, setSampleFactor, setShade, setVolumeVisible, setSliceVisible,
     setSliceAxis, setSliceIndex, sliceCount, resetCamera, glRenderer,

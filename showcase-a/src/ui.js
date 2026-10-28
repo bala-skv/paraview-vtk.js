@@ -38,6 +38,7 @@ export function buildPanel(root, datasets) {
         </label>
       </fieldset>
       <button id="reset">Reset camera</button>
+      <details id="tools"><summary>Tools</summary><div id="toolsBody"></div></details>
       <dl id="info"></dl>
     </aside>`);
   root.appendChild(panel);
@@ -46,7 +47,7 @@ export function buildPanel(root, datasets) {
     panel, dataset: $('dataset'), drop: $('drop'), preset: $('preset'),
     opacity: $('opacity'), opacityOut: $('opacityOut'), sample: $('sample'), sampleOut: $('sampleOut'),
     shade: $('shade'), volVis: $('volVis'), sliceVis: $('sliceVis'), axis: $('axis'),
-    sliceIdx: $('sliceIdx'), sliceOut: $('sliceOut'), reset: $('reset'), info: $('info'),
+    sliceIdx: $('sliceIdx'), sliceOut: $('sliceOut'), reset: $('reset'), tools: $('toolsBody'), info: $('info'),
   };
 }
 

@@ -17,6 +17,12 @@
       #panel fieldset { border: 1px solid #335; display: flex; flex-direction: column; gap: 8px; }
       #drop { border: 1px dashed #557; padding: 8px; text-align: center; color: #99a; }
       #drop.over { border-color: #8cf; color: #8cf; }
+      #tools > summary { cursor: pointer; font-weight: 600; }
+      #toolsBody { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+      #toolsBody fieldset { padding: 6px; gap: 5px; min-width: 0; margin: 0; }
+      #toolsBody legend { font-size: 12px; color: #9ac; }
+      #toolsBody canvas { max-width: 100%; }
+      #toolsBody output.res { font: 11px monospace; color: #9f9; white-space: pre-wrap; }
       #info { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; margin: 0; font-size: 12px; }
       #info dt { color: #99a; } #info dd { margin: 0; word-break: break-word; }
       #view { position: absolute; left: 280px; right: 0; top: 0; bottom: 0; }

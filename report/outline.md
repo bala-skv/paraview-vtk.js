@@ -18,7 +18,7 @@ Marking: `[DRAFT - student to review]` = factual text drafted by the agent. `[ST
 - Evidence: `install_log.md`, `../setup/versions.md`, `../README.md`, clean-room test result (M5).
 
 ## 4. Showcase A
-- [DRAFT - student to review] Features: dataset dropdown and drag-and-drop, four transfer-function presets, opacity and sample-distance sliders, shading toggle, I/J/K slice, info panel, FPS overlay, URL-driven benchmark mode.
+- [DRAFT - student to review] Features: dataset dropdown and drag-and-drop, three transfer-function presets (Grayscale, Bone, Vessel), opacity and sample-distance sliders, shading toggle, I/J/K slice, info panel, FPS overlay, URL-driven benchmark mode.
 - [STUDENT] Observed quality, limits, usability.
 - Evidence: `figures/a_preset_*.png`, `a_slice.png`, `a_fps_overlay.png` (final shots pending; see `screenshots.md`), `swgl_a_*.png` (dev only).
 

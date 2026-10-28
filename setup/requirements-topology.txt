@@ -1,0 +1,5 @@
+# E9 (showcase-b/app_topology.py): no extra Python packages are needed.
+# TTK 1.3.0 is bundled in the ParaView 6.2.0 binary (plugin "TopologyToolKit"); numpy comes from pvpython's
+# own site-packages (1.26.4) -- see report/features_d_log.md for the ~/.local numpy 2.4.3 leak.
+# The app needs only what requirements-pv.txt already pins:
+-r requirements-pv.txt

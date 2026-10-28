@@ -200,7 +200,7 @@ class ShowcaseApp:
                     v3.VBtn("Save state", click=self.ctrl.save_state, size="small", classes="mr-1 mb-1")
                     v3.VBtn("Load state", click=self.ctrl.load_state, size="small", classes="mb-1")
                 html.Div("{{ feature_msg }}", classes="text-caption")
-                html.Div("Connected clients: {{ n_clients }}", classes="text-caption mt-2")
+                html.Div("Clients connected so far: {{ n_clients }}", classes="text-caption mt-2")
         with v3.VDialog(v_model=("shot_dialog", False), max_width=900):
             with v3.VCard():
                 v3.VImg(src=("shot_url", ""))

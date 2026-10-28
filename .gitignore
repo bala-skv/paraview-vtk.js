@@ -10,3 +10,4 @@ node_modules/
 dist/
 __pycache__/
 *.pyc
+showcase-b/out/
